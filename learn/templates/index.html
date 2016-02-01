@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>自学django</title>
+</head>
+<body>
+    <p>django 基础用法</p>
+    <h1>字符串：{{ string }}</h1>
+    <p>for 循环 显示 列表</p>
+    {% for item in list %}
+        {{ item }}
+    {% endfor %}
+    <p>for 循环 判断 字典</p>
+    {% for i,j in dict.items %}
+        {{ i }}:{{ j }}
+    {% endfor %}
+</body>
+</html>
