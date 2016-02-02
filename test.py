@@ -28,4 +28,5 @@ print(type(string))
 string = string.encode('utf-8')
 print(type(string))
 
-
+l = ['111','222']
+print(l)
