@@ -9,11 +9,11 @@ from pyspark.ml.classification import DecisionTreeClassifier
 from pyspark.ml.feature import StringIndexer, VectorIndexer
 from pyspark.ml.evaluation import MulticlassClassificationEvaluator
 
-
+"""连接master"""
 conf = SparkConf().setAppName('tfidf').setMaster('spark://HP-Pavilion:7077')
 sc = SparkContext(conf=conf)
 sqlContext = SQLContext(sc)
-
+"""处理数据集，生成特征向量"""
 dfTitles = sqlContext.read.parquet('roll_news_sina_com_cn.parquet')
 print(dfTitles.dtypes)
 tokenizer = Tokenizer(inputCol="title", outputCol="words")
@@ -26,7 +26,7 @@ rescaledData = idfModel.transform(featurizedData)
 rescaledData.show()
 for features_label in rescaledData.select("features", "rawFeatures").take(3):
     print(features_label)
-
+"""决策树模型培训"""
 # Index labels, adding metadata to the label column.
 # Fit on whole dataset to include all labels in index.
 labelIndexer = StringIndexer(inputCol="label", outputCol="indexedLabel").fit(rescaledData)
@@ -46,14 +46,29 @@ pipeline = Pipeline(stages=[labelIndexer, featureIndexer, dt])
 
 # Train model.  This also runs the indexers.
 model = pipeline.fit(trainingData)
-
+print("---------------------------")
+print(type(model))
+"""模型测试"""
 # Make predictions.
 predictions = model.transform(testData)
 predictions.show()
 predictions.select("label","indexedLabel").show(100)
 # Select example rows to display.
 predictions.select("prediction", "indexedLabel", "features").show(5)
-
+"""自主测试，单个新闻测试"""
+sentenceData = sqlContext.createDataFrame([
+    (u'科技',u"电脑 手机 集群 机器 数据 科技 云计算 大数据"),
+    (u'体育',u"足球 篮球 冠军 成功 比赛 冠军 比分"),
+],['label',"title"])
+tokenizer = Tokenizer(inputCol="title", outputCol="words")
+wordsData = tokenizer.transform(sentenceData)
+hashingTF = HashingTF(inputCol="words", outputCol="rawFeatures", numFeatures=20)
+featurizedData = hashingTF.transform(wordsData)
+rescaledData = idfModel.transform(featurizedData)
+myprediction = model.transform(rescaledData)
+print("==================================================")
+myprediction.show()
+"""模型评估"""
 # Select (prediction, true label) and compute test error
 evaluator = MulticlassClassificationEvaluator(
     labelCol="indexedLabel", predictionCol="prediction", metricName="precision")
@@ -63,4 +78,5 @@ print("Test Error = %g " % (1.0 - accuracy))
 treeModel = model.stages[2]
 # summary only
 print(treeModel)
+
 sc.stop()

@@ -10,11 +10,11 @@ from string import punctuation,digits,letters,whitespace
 def handleAndCut(string):
     """字符串处理，去标点符号，中文分词，return:unicode"""
     #string = string.decode('utf-8')
-    string = re.sub("[\s+\.\!\/_,$%^*(+\"\']+|[+——！：，。？、~@#￥%……&*（）]+".decode("utf-8"), "".decode("utf-8"),string)
+    string = re.sub("[\s+\.\!\/_,$%^*(+\"\']+|[+——！：》，《”。“？、~@#￥%……&*（）]+".decode("utf-8"), "".decode("utf-8"),string)
     string = string.encode('utf-8')
     string = string.translate(None,punctuation+digits+letters+whitespace)
     seg = jieba.cut(string)
-    return ''.join(seg)
+    return ' '.join(seg)
 
 
 #seg_list = jieba.cut("我来到北京清华大学", cut_all=True)
