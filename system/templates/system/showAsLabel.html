@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>查询功能</title>
+</head>
+<body>
+    <p>根据条件查询新闻</p>
+    {% for item in resultList %}
+        {{item.title}}<br/>
+    {% endfor %}
+    <form action="search" method="post">
+        label:<input type="text" name="label"><br>
+        <input type="submit">
+    </form>
+</body>
+</html>

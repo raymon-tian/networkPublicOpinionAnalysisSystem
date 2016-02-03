@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>系统首页</title>
+</head>
+<body>
+    <p>首页显示一定数目的新闻</p>
+    {% for item in sinaNewsList %}
+        {{item.title}}<br/>
+    {% endfor %}
+    <form action="showAsLabel" method="post">
+        label:<input type="text" name="myLabel"><br>
+        <input type="submit">
+    </form>
+</body>
+</html>

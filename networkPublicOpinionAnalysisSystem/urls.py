@@ -16,9 +16,11 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 from learn import views as learn_views
+from system import views as system_views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^index/',learn_views.index),
-    url(r'^test/',learn_views.test),
+    url(r'^index',system_views.index),
+    url(r'^search',system_views.search),
+    url(r'^showAsLabel',system_views.showAsLabel),
 ]

@@ -9,6 +9,33 @@ from pyspark.ml.classification import DecisionTreeClassifier
 from pyspark.ml.feature import StringIndexer, VectorIndexer
 from pyspark.ml.evaluation import MulticlassClassificationEvaluator
 
+def convertDfToList(DataFrame):
+    l = DataFrame.take(DataFrame.count())
+    myList = []
+    for row in l:
+        dic = row.asDict()
+        myList.append(dic)
+    return myList
+
+def showNewsByCategory(DataFrame):
+    """某一种类下的所有新闻，按时间排序"""
+    temp = DataFrame.orderBy('time',ascending=1).where(DataFrame['label']==u'科技').select("*")
+    return convertDfToList(temp)
+
+def predictLabel(label,title,model):
+    """预测新闻的标签"""
+    sentenceData = sqlContext.createDataFrame([
+        (label,title),
+    ],['label',"title"])
+    tokenizer = Tokenizer(inputCol="title", outputCol="words")
+    wordsData = tokenizer.transform(sentenceData)
+    hashingTF = HashingTF(inputCol="words", outputCol="rawFeatures", numFeatures=20)
+    featurizedData = hashingTF.transform(wordsData)
+    rescaledData = idfModel.transform(featurizedData)
+    myprediction = model.transform(rescaledData)
+    return myprediction
+
+
 """连接master"""
 conf = SparkConf().setAppName('tfidf').setMaster('spark://HP-Pavilion:7077')
 sc = SparkContext(conf=conf)
@@ -68,6 +95,11 @@ rescaledData = idfModel.transform(featurizedData)
 myprediction = model.transform(rescaledData)
 print("==================================================")
 myprediction.show()
+
+myprediction = predictLabel(u'体育',u'足球 篮球 冠军 成功 比赛 冠军 比分',model)
+print(type(myprediction))
+print(convertDfToList(myprediction))
+
 """模型评估"""
 # Select (prediction, true label) and compute test error
 evaluator = MulticlassClassificationEvaluator(
@@ -80,3 +112,6 @@ treeModel = model.stages[2]
 print(treeModel)
 
 sc.stop()
+
+
+    

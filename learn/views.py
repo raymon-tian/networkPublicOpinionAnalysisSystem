@@ -20,7 +20,7 @@ def index(request):
     url='jdbc:mysql://127.0.0.1:3306?user=root&password=raymon'
     dbtable='networkPublicOpinionAnalysisSystem.test'
     df = sqlContext.read.format('jdbc').options(url=url,dbtable=dbtable).load()
-    lines = sc.textFile(settings.BASE_DIR+'/data/roll_news_sina_com_cn.csv')
+    lines = sc.textFile(settings.BASE_DIR+'/system/data/roll_news_sina_com_cn.csv')
     parts = lines.map(lambda l:l.split(','))
     schemaNews = parts.map(lambda p : Row(category=p[0],title=p[1],url=p[2],time=p[3]))
     news = sqlContext.createDataFrame(schemaNews)
